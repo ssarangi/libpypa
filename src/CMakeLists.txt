@@ -1,10 +1,17 @@
 include(CheckCXXCompilerFlag)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${libpypa_SOURCE_DIR}/modules/")
-find_package(GMP REQUIRED)
+
+if (NOT MSVC)
+	find_package(GMP REQUIRED)
+endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Werror -pedantic -Wno-unused-parameter -Wno-unused-const-variable")
+if (MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+else()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -W -Wall -Werror -pedantic -Wno-unused-parameter -Wno-unused-const-variable")
+endif()
 
 check_cxx_compiler_flag(-Wno-unused-local-typedefs CXX_NO_UNUSED_LOCAL_TYPEDEFS)
 if(CXX_NO_UNUSED_LOCAL_TYPEDEFS)
@@ -29,12 +36,22 @@ add_library(pypa pypa/ast/ast.cc
 # lexer_test
 add_executable(lexer-test EXCLUDE_FROM_ALL pypa/parser/test.cc)
 add_dependencies(lexer-test pypa)
-target_link_libraries(lexer-test pypa gmp double-conversion)
+
+if(MSVC)
+	target_link_libraries(lexer-test pypa double-conversion)	
+else()
+	target_link_libraries(lexer-test pypa gmp double-conversion)
+endif()
 
 # parser_test
 add_executable(parser-test EXCLUDE_FROM_ALL pypa/parser/test.cc)
 add_dependencies(parser-test pypa)
-target_link_libraries(parser-test pypa gmp double-conversion)
+
+if(MSVC)
+	target_link_libraries(parser-test pypa double-conversion)
+else()
+	target_link_libraries(parser-test pypa gmp double-conversion)
+endif()
 
 # install
 install(TARGETS pypa ARCHIVE DESTINATION lib)
