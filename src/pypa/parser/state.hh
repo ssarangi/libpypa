@@ -112,13 +112,13 @@ namespace {
     }
 
     inline void location(State & s, AstPtr a) {
-        a->line = top(s).line;
-        a->column = top(s).column;
+        a->line = (uint32_t)top(s).line;
+        a->column = (uint32_t)top(s).column;
     }
 
     inline void location(State & s, Ast & a) {
-        a.line = top(s).line;
-        a.column = top(s).column;
+        a.line = (uint32_t)top(s).line;
+        a.column = (uint32_t)top(s).column;
     }
 
     inline void clone_location(Ast & source, Ast & target) {

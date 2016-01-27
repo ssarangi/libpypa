@@ -20,6 +20,11 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#if defined _MSC_VER
+#include <functional>
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 #include <pypa/ast/ast.hh>
 #include <pypa/parser/future_features.hh>
 #include <pypa/parser/error.hh>

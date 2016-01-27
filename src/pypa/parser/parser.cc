@@ -15,7 +15,9 @@
 #include <cassert>
 #include <cstddef>
 
+#if !defined _MSC_VER
 #include <gmp.h>
+#endif
 
 #include <pypa/parser/apply.hh>
 #include <pypa/parser/parser_fwd.hh>
@@ -85,7 +87,7 @@ void syntax_error_dbg(State & s, AstPtr ast, char const * message, int line = -1
         cur.line    = ast->line;
         cur.column  = ast->column;
     }
-    s.errors.push({ErrorType::SyntaxError, message, s.lexer->get_name(), cur, ast, s.lexer->get_line(cur.line), line, file ? file : "", function ? function : ""});
+    s.errors.push({ErrorType::SyntaxError, message, s.lexer->get_name(), cur, ast, s.lexer->get_line((uint32_t)cur.line), line, file ? file : "", function ? function : ""});
     report_error(s);
 }
 
@@ -95,7 +97,7 @@ void indentation_error_dbg(State & s, AstPtr ast, int line = -1, char const * fi
         cur.line    = ast->line;
         cur.column  = ast->column;
     }
-    s.errors.push({ErrorType::IndentationError, "", s.lexer->get_name(), cur, ast, s.lexer->get_line(cur.line), line, file ? file : "", function ? function : ""});
+    s.errors.push({ErrorType::IndentationError, "", s.lexer->get_name(), cur, ast, s.lexer->get_line((uint32_t)cur.line), line, file ? file : "", function ? function : ""});
     report_error(s);
 }
 
@@ -103,6 +105,7 @@ void indentation_error_dbg(State & s, AstPtr ast, int line = -1, char const * fi
 #define indentation_error(s, AST_ITEM) indentation_error_dbg(s, error_transform(AST_ITEM), __LINE__, __FILE__, __PRETTY_FUNCTION__)
 
 bool number_from_base(int64_t base, State & s, AstNumberPtr & ast) {
+#if !defined _MSC_VER
     String const & value = top(s).value;
     AstNumber & result = *ast;
 
@@ -127,6 +130,7 @@ bool number_from_base(int64_t base, State & s, AstNumberPtr & ast) {
         result.integer = mpz_get_si(&integ);
     }
     mpz_clear(&integ);
+#endif
     return true;
 }
 
@@ -2755,7 +2759,7 @@ SymbolTablePtr create_symbol_table(AstPtr const & a, State & s) {
     create_from_ast(table, *a,
                     [&s](Error e) {
                         e.file_name = s.lexer->get_name();
-                        e.line = s.lexer->get_line(e.cur.line);
+                        e.line = s.lexer->get_line((uint32_t)e.cur.line);
                         s.errors.push(e);
                         report_error(s);
                     });

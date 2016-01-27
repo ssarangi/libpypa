@@ -14,6 +14,10 @@
 
 #include <cassert>
 
+#if defined _MSC_VER
+#include <iterator>
+#endif
+
 #include <pypa/types.hh>
 
 namespace pypa {
